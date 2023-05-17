@@ -1,10 +1,21 @@
 import os
 from flask import Flask, request
+from lib.database_connection import get_flask_database_connection
+from lib.album_repository import AlbumRepository
+from lib.album import Album
 
 # Create a new Flask app
 app = Flask(__name__)
 
 # == Your Routes Here ==
+
+@app.route('/albums', methods=['POST'])
+def add_albums():
+    connection = get_flask_database_connection(app)
+    repository = AlbumRepository(connection)
+    album1 = Album(None, 'title1', '2023','1')
+    repository.create(album1)
+    
 
 # == Example Code Below ==
 
