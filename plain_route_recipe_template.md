@@ -22,6 +22,25 @@ POST /albums
   title: string
   release_year: integer
   artist_id: integer
+
+## Challenge:
+
+GET /artists
+# Expected response (200 OK)
+(Pixies, ABBA, Taylor Swift, Nina Simone)
+
+POST /artists
+# With body parameters:
+name=Wild nothing
+genre=Indie
+# Expected response (200 OK)
+(creates a new artist in the database)
+
+*verify the new artist is returned in the response of GET /artists*
+GET /artists
+# Expected response (200 OK)
+Pixies, ABBA, Taylor Swift, Nina Simone, Wild nothing
+
 ```
 
 ## 2. Create Examples as Tests
@@ -99,6 +118,39 @@ def test_get_album_1(web_client):
     response = web_client.get('/albums/1')
     assert response.status_code == 200
     assert response.data.decode('utf-8') == "Album(1, Doolittle, 1989, 1)"
+
+"""
+When I make a GET request to /artists
+Then I should get Expected response (200 OK) and the below output:
+(Pixies, ABBA, Taylor Swift, Nina Simone)
+"""
+def test_get_artists(web_client):
+    response = web_client.get('/artists')
+    assert response.status_code == 200
+    assert response.data.decode('utf-8') == "Pixies, ABBA, Taylor Swift, Nina Simone"
+
+"""
+When I make a POST request to /artists
+With body parameters: name=Wild nothing, genre=Indie
+Then I should get the Expected response (200 OK) and no content
+(creates a new artist in the database)
+"""
+def test_post_artists(db_connection, web_client):
+    db_connection.seed("seeds/albums_table.sql")
+    response = web_client.post('/artists', data={'name': 'Wild nothing', 'genre': 'Indie'})
+    assert response.status_code == 200
+    assert response.data.decode('utf-8') == ''
+
+
+"""
+When I make another GET request to /artists
+Then I should get Expected response (200 OK) and the new list :
+(Pixies, ABBA, Taylor Swift, Nina Simone, Wild nothing)
+"""
+def test_get_artists_with_new_name(web_client):
+    response = web_client.get('/artists')
+    assert response.status_code == 200
+    assert response.data.decode('utf-8') == "Pixies, ABBA, Taylor Swift, Nina Simone, Wild nothing"
 
 
 ```
